@@ -42,7 +42,7 @@ There is a frontend example which draws out the topology learned from BGP-LS and
 
 Imagine this scenario:
 
-[Scenario](/imgs/bgpls-ted-diag-2.PNG)
+![Scenario](/imgs/bgpls-ted-diag-2.PNG)
 
 IGP domain `ISIS` has no visibility to IGP domain `OSPF`, therefore an LSP can't actually be built between router `A` and router `B`. But because we have a router within each domain which distributes its link state database into BGP-LS towards the controller/application, bgpls-ted has full visibility of both domains and can initiate a traffic engineering tunnel from the headend (`A`) and program the tunnel so that we have an end to end LSP, segment routing in this case we would just program the tunnel from A to B if we want traffic taking the specific path of the dashed orange lines on the diagram.
 
