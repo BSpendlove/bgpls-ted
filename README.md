@@ -49,25 +49,25 @@ IGP domain `ISIS` has no visibility to IGP domain `OSPF`, therefore an LSP can't
 #### Frontend examples
 
 Topology:
-[Topology](/imgs/bgpls-ted-diag-3.PNG)
+![Topology](/imgs/bgpls-ted-diag-3.PNG)
 
 Links:
-[Links](/imgs/bgpls-ted-diag-4.PNG)
+![Links](/imgs/bgpls-ted-diag-4.PNG)
 
 Prefixes:
-[Prefixes](/imgs/bgpls-ted-diag-5.PNG)
+![Prefixes](/imgs/bgpls-ted-diag-5.PNG)
 
 JSON:
-[JSON](/imgs/bgpls-ted-diag-6.PNG)
+![JSON](/imgs/bgpls-ted-diag-6.PNG)
 
 
 Eve-NG topology vs what bgpls-ted captured:
 
 `eve-ng`
-[EVE-NG](/imgs/bgpls-ted-diag-7.PNG)
+![EVE-NG](/imgs/bgpls-ted-diag-7.PNG)
 
 `bgpls-ted`
-[bgpls-ted](/imgs/bgpls-ted-diag-8.PNG)
+![bgpls-ted](/imgs/bgpls-ted-diag-8.PNG)
 
 ### How to run
 
