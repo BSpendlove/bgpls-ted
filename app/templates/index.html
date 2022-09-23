@@ -1,0 +1,116 @@
+{% extends "layouts/base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/vis-network.min.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- First comes a content container with the main title -->
+<div class="content">
+    <h1 class="content-title font-size-22 text-center">
+        <!-- font-size-22 = font-size: 2.2rem (22px) -->
+        BGP-LS Topology
+    </h1>
+</div>
+
+<div id="topology" class="container h-600 border shadow">
+</div>
+
+<div class="row row-eq-spacing-lg">
+    <div class="col-6 col-xl-3">
+        <div class="card">
+            <h2 class="card-title">BGP-LS Nodes</h2>
+            {{ bgpls_nodes }}
+        </div>
+    </div>
+
+    <div class="col-6 col-xl-3">
+        <div class="card">
+            <h2 class="card-title">BGP-LS Links</h2>
+            {{ bgpls_links }}
+        </div>
+    </div>
+
+    <div class="col-6 col-xl-3">
+        <div class="card">
+            <h2 class="card-title">BGP-LS Prefixes (v4)</h2>
+            {{ bgpls_prefixes_v4 }}
+        </div>
+    </div>
+
+    <div class="col-6 col-xl-3">
+        <div class="card">
+            <h2 class="card-title">BGP-LS Prefixes (v6)</h2>
+            {{ bgpls_prefixes_v6 }}
+        </div>
+    </div>
+</div>
+
+<div class="row row-eq-spacing">
+    <div class="col-12">
+        <div class="card">
+            <h2 class="content-title">Nodes</h2>
+            <div class="mt-20">
+                <a href="#modal-1" class="btn btn-primary" role="button">View JSON</a>
+            </div>
+            <!-- Hoverable rows -->
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Node ID</th>
+                        <th>Node Name</th>
+                        <th>L3 Topology ID</th>
+                        <th>Area ID + Router ID</th>
+                        <th>SIDs</th>
+                        <th># Links</th>
+                        <th># v4 Prefixes</th>
+                        <th># v6 Prefixes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for node in topology.nodes %}
+                    <tr>
+                        <td>{{ node.node_id }}</td>
+                        <td>{{ node.attributes.bgp_ls.node_name }}</td>
+                        <td>{{ node.l3_routing_topology }}</td>
+                        <td>{{ node.attributes.bgp_ls.area_id }}.{{ node.node_descriptors.router_id }}</td>
+                        <td>{{ node.attributes.bgp_ls.sids[0] }}</td>
+                        <td><a href="{{ url_for('bgpls_topology_links') }}?node_id={{ node.node_id }}">{{ node.links | length }}</a></td>
+                        <td><a href="{{ url_for('bgpls_topology_prefixes') }}?node_id={{ node.node_id }}">{{ node.prefixes_v4 | length }}</a></td>
+                        <td><a href="{{ url_for('bgpls_topology_prefixes') }}?node_id={{ node.node_id }}">{{ node.prefixes_v6 | length }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div class="modal modal-full ie-scroll-fix" id="modal-1" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="text-right mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
+                <a href="#" class="btn mr-5" role="button">Close</a>
+            </div>
+            <a href="#" class="close" role="button" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+            <h5 class="modal-title">JSON Output</h5>
+            <pre>
+                {{ topology | tojson(4) }}
+            </pre>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var topology = JSON.parse('{{ topology | tojson | safe}}');
+</script>
+<script src="{{ url_for('static', path='/js/vis.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/vis-network.min.js') }}"></script>
+<script src="{{ url_for('static', path='/js/topology.js') }}"></script>
+{% endblock %}

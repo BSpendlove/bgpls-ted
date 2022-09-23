@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+    exabgpapi:
+        build: ./bgpls-ted/exabgp
+        ports:
+            - '179:179'
+        volumes:
+            - './bgpls-ted/exabgp/exabgp.conf:/etc/exabgp/exabgp.conf'
+        container_name: exabgpapi
+        restart: always
+        env_file:
+            - ./env/app
+        depends_on:
+            - rabbitmq
+            - exabgpapi-worker
+
+    exabgpapi-worker:
+        build: 
+            context: ./bgpls-ted/exabgp
+            dockerfile: Dockerfile-worker
+        container_name: 'exabgpapi-worker'
+        restart: always
+        env_file:
+            - ./env/app
+        depends_on:
+            - rabbitmq
+            - mongodb
+
+    rabbitmq:
+        image: rabbitmq:3.9-management
+        container_name: rabbitmq
+        env_file:
+            - ./env/rabbitmq
+        ports:
+            - 5672:5672
+            - 15672:15672
+
+    mongodb:
+        container_name: mongodb
+        image: mongo
+        restart: always
+        env_file:
+            - ./env/mongodb
+        ports:
+        - "27017:27017"
+
+volumes:
+    exabgpapi:
+        driver: local
+    rabbitmq_data:
+    rabbitmq_log:

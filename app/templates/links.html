@@ -1,0 +1,97 @@
+{% extends "layouts/base.html" %}
+{% set active_page = "bgpls_topology" %}
+
+{% block content %}
+<!-- First comes a content container with the main title -->
+<div class="content">
+    <h1 class="content-title font-size-22">
+        <!-- font-size-22 = font-size: 2.2rem (22px) -->
+        <a class="text-decoration-none text-reset" href="{{ url_for('bgpls_topology') }}">BGP-LS Topology</a> > <a class="text-decoration-none" href="{{ url_for('bgpls_topology_links') }}">Links</a> ({{ node_id }}{% if node_name is defined %} - {{ node_name }}{% endif %})
+    </h1>
+</div>
+
+<div class="row row-eq-spacing-lg">
+    <div class="col-12">
+        <div class="card">
+            <h2 class="card-title">BGP-LS Links</h2>
+            {% if links | length > 0 %}
+            <div class="d-flex flex-wrap">
+                {% for link in links %}
+                <div class="alert alert-secondary mb-5 mr-5" role="alert">
+                    Local: {{ link.interface_address.interface_address }}
+                    <br>
+                    Remote: <a href="{{ url_for('bgpls_topology_links_by_neighbor_address')}}?neighbor_address={{ link.neighbor_address.neighbor_address }}">{{ link.neighbor_address.neighbor_address }}</a>
+                    <br>
+                    IGP/TE Metric: {{ link.attributes.bgp_ls.igp_metric }} / {{ link.attributes.bgp_ls.te_metric }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+                No links found for this node...
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row row-eq-spacing">
+    <div class="col-12">
+        <div class="card">
+            <h2 class="content-title">Local Links</h2>
+            <div class="mt-20">
+                <a href="#modal-1" class="btn btn-primary" role="button">View JSON</a>
+            </div>
+            <!-- Hoverable rows -->
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Local IP</th>
+                        <th>Remote IP</th>
+                        <th>Origin</th>
+                        <th>Remote Router ID</th>
+                        <th>Max Link B/W</th>
+                        <th>IGP Metric</th>
+                        <th>TE Metric</th>
+                        <th>SID(s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in links %}
+                    <tr>
+                        <td>{{ link.interface_address.interface_address }}</td>
+                        <td><a href="{{ url_for('bgpls_topology_links_by_neighbor_address')}}?neighbor_address={{ link.neighbor_address.neighbor_address }}">{{ link.neighbor_address.neighbor_address }}</a></td>
+                        <td>{{ link.attributes.origin }}</td>
+                        <td>{{ link.attributes.bgp_ls.remote_te_router_id }}</td>
+                        <td>{{ link.attributes.bgp_ls.maximum_link_bandwidth }}</td>
+                        <td>{{ link.attributes.bgp_ls.igp_metric }}</td>
+                        <td>{{ link.attributes.bgp_ls.te_metric }}</td>
+                        <td>{% if link.attributes.bgp_ls.sids %}{{ link.attributes.bgp_ls.sids | join(",")}}{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block modals %}
+<div class="modal modal-full ie-scroll-fix" id="modal-1" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="text-right mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
+                <a href="#" class="btn mr-5" role="button">Close</a>
+            </div>
+            <a href="#" class="close" role="button" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+            <h5 class="modal-title">JSON Output</h5>
+            <pre>
+                {{ links | tojson(4) }}
+            </pre>
+        </div>
+    </div>
+</div>
+{% endblock %}

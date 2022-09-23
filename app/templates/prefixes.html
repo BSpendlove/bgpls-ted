@@ -1,0 +1,106 @@
+{% extends "layouts/base.html" %}
+{% set active_page = "bgpls_topology" %}
+
+{% block content %}
+<!-- First comes a content container with the main title -->
+<div class="content">
+    <h1 class="content-title font-size-22">
+        <!-- font-size-22 = font-size: 2.2rem (22px) -->
+        <a class="text-decoration-none text-reset" href="{{ url_for('bgpls_topology') }}">BGP-LS Topology</a> > <a class="text-decoration-none" href="{{ url_for('bgpls_topology_prefixes') }}?node_id={{ node_id }}">Prefixes</a> ({{ node_id }}{% if node_name is defined %} - {{ node_name }}{% endif %})
+    </h1>
+</div>
+
+<div class="row row-eq-spacing-lg">
+    <div class="col-12">
+        <div class="card">
+            <h2 class="card-title">BGP-LS Prefixes (v4)</h2>
+            {% if prefixes_v4 | length > 0 %}
+            <div class="d-flex flex-wrap">
+                {% for prefix in prefixes_v4 %}
+                <div class="alert alert-success mb-5 mr-5" role="alert">
+                    Prefix: {{ prefix.ip_reach_prefix }}
+                    <br>
+                    Reachability TLV: {{ prefix.ip_reachability_tlv }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+                No v4 prefixes found for this node...
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row row-eq-spacing">
+    <div class="col-12">
+        <div class="card">
+            <h2 class="content-title">Local v4 Prefixes</h2>
+            <div class="mt-20">
+                <a href="#modal-1" class="btn btn-primary" role="button">View JSON</a>
+            </div>
+            <!-- Hoverable rows -->
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Prefix</th>
+                        <th>Reach TLV</th>
+                        <th>Metric</th>
+                        <th>SR Prefix Flags</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prefix in prefixes_v4 %}
+                    <tr>
+                        <td>{{ prefix.ip_reach_prefix }}</td>
+                        <td>{{ prefix.ip_reachability_tlv }}</td>
+                        <td>{{ prefix.attributes.bgp_ls.prefix_metric }}</td>
+                        <td><pre>{{ prefix.attributes.bgp_ls.sr_prefix_attribute_flags }}</pre></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2 class="content-title">Local v6 Prefixes</h2>
+            <!-- Hoverable rows -->
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>x</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prefix in prefixes_v6 %}
+                    <tr>
+                        <td>data</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div class="modal modal-full ie-scroll-fix" id="modal-1" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="text-right mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
+                <a href="#" class="btn mr-5" role="button">Close</a>
+            </div>
+            <a href="#" class="close" role="button" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+            <h5 class="modal-title">JSON Output</h5>
+            <pre>
+                {{ prefixes_v4 | tojson(4) }}
+                {{ prefixes_v6 | tojson(4) }}
+            </pre>
+        </div>
+    </div>
+</div>
+{% endblock %}
